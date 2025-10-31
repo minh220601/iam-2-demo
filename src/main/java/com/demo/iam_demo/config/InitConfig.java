@@ -15,43 +15,45 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 @Slf4j
 public class InitConfig {
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
-
-    private static final String ADMIN_EMAIL = "admin123@gmail.com";
-    private static final String ADMIN_PASSWORD = "123456";
-    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_ROLE_NAME = "ADMIN";
+    private static final String USER_ROLE_NAME = "USER";
+    private static final String DEFAULT_PASSWORD = "123456";
 
     @Bean
-    ApplicationRunner initData(){
+    ApplicationRunner initData(
+            PasswordEncoder passwordEncoder,
+            RoleRepository roleRepository,
+            UserRepository userRepository
+    ){
         return args -> {
             log.info("Initializing default roles and admin user.");
 
             //tạo role nếu chưa có
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_USER").build()));
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_ADMIN").build()));
-            Role modRole = roleRepository.findByName("ROLE_MODERATOR")
-                    .orElseGet(() -> roleRepository.save(Role.builder().name("ROLE_MODERATOR").build()));
+            Role userRole = roleRepository.findByName(USER_ROLE_NAME)
+                    .orElseGet(() -> roleRepository.save(Role.builder().name(USER_ROLE_NAME).build()));
+            Role adminRole = roleRepository.findByName(ADMIN_ROLE_NAME)
+                    .orElseGet(() -> roleRepository.save(Role.builder().name(ADMIN_ROLE_NAME).build()));
+
+            final String adminEmail = "admin123@gmail.com";
+            final String adminUsername = "admin123";
 
             // tạo admin user nếu chưa có
-            if(userRepository.findByEmail(ADMIN_EMAIL).isEmpty()){
+            if(userRepository.findByEmail(adminEmail).isEmpty()){
                 User admin = User.builder()
-                        .email(ADMIN_EMAIL)
-                        .username(ADMIN_USERNAME)
-                        .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                        .active(true)
+                        .email(adminEmail)
+                        .username(adminUsername)
+                        .password(passwordEncoder.encode(DEFAULT_PASSWORD))
+                        .firstName("System")
+                        .lastName("Admin")
                         .build();
 
                 // gán quyền admin
                 admin.getRoles().add(adminRole);
                 userRepository.save(admin);
-                log.warn("Admin user created: {} / {}", ADMIN_EMAIL, ADMIN_PASSWORD);
+                log.warn("Admin user created: {} / {}", adminEmail, DEFAULT_PASSWORD);
                 log.info("Please change the password after first login");
             }
-            log.info("Initialization complete");
+            log.info("Initialization complete. Total roles: {}", roleRepository.count());
         };
     }
 }
