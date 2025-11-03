@@ -51,22 +51,22 @@ public class UserService {
                 .address(request.getAddress())
                 .phone(request.getPhone())
                 .avatar(request.getAvatar())
-                .active(request.isActive())
                 .build();
 
         // gán role
+        Set<Role> roles;
         if (request.getRoles() != null && !request.getRoles().isEmpty()){
-            Set<Role> roles = request.getRoles().stream()
+            roles = request.getRoles().stream()
                     .map(roleName -> roleRepository.findByName(roleName)
                             .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND, "Role not found: " + roleName)))
                     .collect(Collectors.toSet());
-            user.setRoles(roles);
         } else {
             // nếu không gửi role thì mặc định là ROLE_USER
             Role defaultRole = roleRepository.findByName("ROLE_USER")
                     .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND, "Default role not found"));
-            user.getRoles().add(defaultRole);
+            roles = Set.of(defaultRole);
         }
+        user.setRoles(roles);
 
         // lưu user mới vào database
         User savedUser = userRepository.save(user);
@@ -120,8 +120,6 @@ public class UserService {
         if (request.getPhone() != null) user.setPhone(request.getPhone());
         if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
 
-        // cập nhật trạng thái active
-        user.setActive(request.isActive());
 
         // cập nhật role
         if (request.getRoles() != null && !request.getRoles().isEmpty()){

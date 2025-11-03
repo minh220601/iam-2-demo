@@ -14,6 +14,9 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(2002, "User already exists", HttpStatus.CONFLICT),
     INVALID_PASSWORD(2003, "Invalid password", HttpStatus.BAD_REQUEST),
     ROLE_NOT_FOUND(2004, "Role not found", HttpStatus.NOT_FOUND),
+    ROLE_ALREADY_EXISTS(2005, "Role already exists", HttpStatus.CONFLICT),
+    PERMISSION_NOT_FOUND(2006, "Permission not found", HttpStatus.NOT_FOUND),
+    PERMISSION_ALREADY_EXISTS(2007, "Permission already exists", HttpStatus.CONFLICT),
 
     // VALIDATION
     INVALID_OUTPUT(3001, "Invalid output", HttpStatus.BAD_REQUEST),

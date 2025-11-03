@@ -51,9 +51,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(encodedPassword)
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .active(true)
+
                 .build();
 
         user.getRoles().add(defaultRole);
@@ -62,7 +60,7 @@ public class AuthService {
         User saved = userRepository.save(user);
 
         // trả DTO
-        return new UserResponse(saved.getId(), saved.getEmail(), saved.getUsername(), saved.isActive());
+        return new UserResponse(saved.getId(), saved.getEmail(), saved.getUsername());
     }
 
     // khởi tạo đăng nhập (gửi OTP hoặc tạo token trực tiếp nếu là admin
